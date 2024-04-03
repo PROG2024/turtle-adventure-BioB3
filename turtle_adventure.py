@@ -367,7 +367,7 @@ class RandomEnemy(Enemy):
                                        fill=self.color)
 
     def update(self) -> None:
-        if self.__destination[0]-self.x <= 10 and self.__destination[1]-self.y <= 10:
+        if self.__destination[0] == self.x and self.__destination[1] == self.y:
             self.__destination = self.gen_dest()
         self.update_x()
         self.update_y()

@@ -217,7 +217,7 @@ class Enemy(TurtleGameElement):
         super().__init__(game)
         self.__size = size
         self.__color = color
-        self.__speed = random.randint(-5,5)
+        self.__speed = random.randint(1,5)
 
     @property
     def size(self) -> float:
@@ -340,19 +340,37 @@ class RandomEnemy(Enemy):
                  size: int,
                  color: str):
         super().__init__(game, size, color)
-        self.__destination = (random.randint(0,self.canvas.winfo_width()),
-                              random.randint(0,self.canvas.winfo_height()))
+        self.__destination = self.gen_dest()
+
+    def gen_dest(self) -> None:
+        return (random.randint(0,self.canvas.winfo_width()),
+                random.randint(0,self.canvas.winfo_height()))
+
+    def update_x(self):
+        if self.__destination[0] > self.x:
+            self.x += min(self.speed, self.__destination[0] - self.x)
+        elif self.__destination[0] < self.x:
+            self.x -= min(self.speed, self.x - self.__destination[0])
+        else:
+            return
+
+    def update_y(self):
+        if self.__destination[1] > self.y:
+            self.y += min(self.speed, self.__destination[1] - self.y)
+        elif self.__destination[1] < self.y:
+            self.y -= min(self.speed, self.y - self.__destination[1])
+        else:
+            return
 
     def create(self) -> None:
         self.__id = self.canvas.create_oval(0, 0, 0, 0,
                                        fill=self.color)
 
     def update(self) -> None:
-        if self.__destination[0]-self.x <= 1 and self.__destination[1]-self.y <= 1:
-            self.__destination = (random.randint(0,self.canvas.winfo_width()),
-                                  random.randint(0,self.canvas.winfo_height()))
-        self.x += (self.__destination[0]-self.x)/random.choice([20,30,40])
-        self.y += (self.__destination[1]-self.y)/random.choice([20,30,40])
+        if self.__destination[0]-self.x <= 10 and self.__destination[1]-self.y <= 10:
+            self.__destination = self.gen_dest()
+        self.update_x()
+        self.update_y()
         if self.hits_player():
             self.game.game_over_lose()
 
@@ -366,6 +384,13 @@ class RandomEnemy(Enemy):
     def delete(self) -> None:
         self.canvas.delete(self.__id)
 
+class ChasingEnemy(Enemy):
+    def __init__(self, 
+                 game: "TurtleAdventureGame",
+                 size: int,
+                 color: str):
+        super().__init__(game, size, color)
+        
 # TODO
 # Complete the EnemyGenerator class by inserting code to generate enemies
 # based on the given game level; call TurtleAdventureGame's add_enemy() method

@@ -348,11 +348,11 @@ class RandomEnemy(Enemy):
                                        fill=self.color)
 
     def update(self) -> None:
-        if self.__destination[0]-self.x <= 0.5 and self.__destination[1]-self.y <= 0.5:
+        if self.__destination[0]-self.x <= 1 and self.__destination[1]-self.y <= 1:
             self.__destination = (random.randint(0,self.canvas.winfo_width()),
                                   random.randint(0,self.canvas.winfo_height()))
-        self.x += (self.__destination[0]-self.x)/20
-        self.y += (self.__destination[1]-self.y)/20
+        self.x += (self.__destination[0]-self.x)/random.choice([20,30,40])
+        self.y += (self.__destination[1]-self.y)/random.choice([20,30,40])
         if self.hits_player():
             self.game.game_over_lose()
 
@@ -407,8 +407,8 @@ class EnemyGenerator:
         """
         for _ in range(10):
             new_enemy = RandomEnemy(self.__game, 20, "red")
-            new_enemy.x = 100
-            new_enemy.y = 100
+            new_enemy.x = random.randint(0, new_enemy.canvas.winfo_width())
+            new_enemy.y = random.randint(0, new_enemy.canvas.winfo_height())
             self.game.add_element(new_enemy)
 
 

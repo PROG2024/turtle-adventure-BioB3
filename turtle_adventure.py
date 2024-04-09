@@ -260,12 +260,6 @@ class Enemy(TurtleGameElement):
         )
 
 
-# TODO
-# * Define your enemy classes
-# * Implement all methods required by the GameElement abstract class
-# * Define enemy's update logic in the update() method
-# * Check whether the player hits this enemy, then call the
-#   self.game.game_over_lose() method in the TurtleAdventureGame class.
 class DemoEnemy(Enemy):
     """
     Demo enemy
@@ -486,6 +480,62 @@ class FencingEnemy(Enemy):
     def delete(self) -> None:
         self.canvas.delete(self.__id)
 
+class CrossEnemy(Enemy):
+    def __init__(self,
+                 game: "TurtleAdventureGame",
+                 size: int,
+                 color: str):
+        super().__init__(game, size, color)
+        self.__state = self.move_down_state
+        self.x = 0
+        self.y = 0
+        self.__x_speed = 0
+        self.__y_speed = 0
+
+    def create(self) -> None:
+        self.__imgtk = ImageTk.PhotoImage(Image.open(
+            os.path.join(os.getcwd(), 'images','gauss-in-action-glyph.png')))
+        self.__id = self.canvas.create_image(self.x,self.y, image=self.__imgtk, anchor=tk.CENTER)
+        self.speed = random.randint(10,15)
+
+    def move_down_state(self):
+        if self.canvas.winfo_height()-self.y >= 10:
+            delta_x = self.canvas.winfo_width() - self.x
+            delta_y = self.canvas.winfo_height() - self.y
+            hypotenuse = (delta_x**2 + delta_y**2)**0.5
+            self.__x_speed = self.speed * (delta_x/hypotenuse)
+            self.__y_speed = self.speed * (delta_y/hypotenuse)
+            self.x += self.__x_speed
+            self.y += self.__y_speed
+        else:
+            self.x = 0
+            self.y = self.canvas.winfo_height()
+            self.__state = self.move_up_state
+
+    def move_up_state(self):
+        if self.y >= 10:
+            delta_x = self.canvas.winfo_width() - self.x
+            delta_y = self.y
+            hypotenuse = (delta_x**2 + delta_y**2)**0.5
+            self.__x_speed = self.speed * (delta_x/hypotenuse)
+            self.__y_speed = self.speed * (delta_y/hypotenuse)
+            self.x += self.__x_speed
+            self.y -= self.__y_speed
+        else:
+            self.x = 0
+            self.y = 0
+            self.__state = self.move_down_state
+
+    def update(self) -> None:
+        self.__state()
+        if self.hits_player():
+            self.game.game_over_lose()
+
+    def render(self) -> None:
+        self.canvas.coords(self.__id,self.x,self.y)
+
+    def delete(self) -> None:
+        self.canvas.delete(self.__id)
 
 # TODO
 # Complete the EnemyGenerator class by inserting code to generate enemies
@@ -527,7 +577,7 @@ class EnemyGenerator:
         Create a new enemy, possibly based on the game level
         """
         for _ in range(10):
-            new_enemy = FencingEnemy(self.__game, 10, "red")
+            new_enemy = CrossEnemy(self.__game, 25, "red")
             self.game.add_element(new_enemy)
 
 

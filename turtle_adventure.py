@@ -4,7 +4,9 @@ adventure game.
 """
 from turtle import RawTurtle
 from gamelib import Game, GameElement
-import random
+from PIL import Image, ImageTk
+import random, os
+import tkinter as tk
 
 
 class TurtleGameElement(GameElement):
@@ -217,7 +219,7 @@ class Enemy(TurtleGameElement):
         super().__init__(game)
         self.__size = size
         self.__color = color
-        self.__speed = random.randint(1,5)
+        self.__speed: int
 
     @property
     def size(self) -> float:
@@ -280,6 +282,7 @@ class DemoEnemy(Enemy):
     def create(self) -> None:
         self.__id = self.canvas.create_oval(0, 0, 0, 0,
                                        fill=self.color)
+        self.speed = random.randint(1,5)
 
     def update(self) -> None:
         self.__x_state()
@@ -360,6 +363,9 @@ class RandomEnemy(Enemy):
     def create(self) -> None:
         self.__id = self.canvas.create_oval(0, 0, 0, 0,
                                        fill=self.color)
+        self.speed = random.randint(1,5)
+        self.x = random.randint(0, self.canvas.winfo_width())
+        self.y = random.randint(0, self.canvas.winfo_height())
 
     def update(self) -> None:
         if self.__destination[0] == self.x and self.__destination[1] == self.y:
@@ -403,8 +409,11 @@ class ChasingEnemy(Enemy):
             self.y -= min(self.speed, self.y - self.__player_loc[1])
 
     def create(self) -> None:
-        self.__id = self.canvas.create_oval(0, 0, 0, 0,
-                                       fill=self.color)
+        self.__id = self.canvas.create_rectangle(0, 0, 0, 0,
+                                                 fill=self.color)
+        self.speed = random.randint(3,5)
+        self.x = random.randint(0, self.canvas.winfo_width())
+        self.y = random.randint(0, self.canvas.winfo_height())
 
     def update(self) -> None:
         self.__player_loc = self.gen_player_loc()
@@ -464,8 +473,6 @@ class EnemyGenerator:
         """
         # for _ in range(10):
         new_enemy = ChasingEnemy(self.__game, 20, "red")
-        new_enemy.x = random.randint(0, new_enemy.canvas.winfo_width())
-        new_enemy.y = random.randint(0, new_enemy.canvas.winfo_height())
         self.game.add_element(new_enemy)
 
 

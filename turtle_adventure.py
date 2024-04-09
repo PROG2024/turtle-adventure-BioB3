@@ -5,7 +5,7 @@ adventure game.
 from turtle import RawTurtle
 from gamelib import Game, GameElement
 from PIL import Image, ImageTk
-import random, os
+import random, os, math
 import tkinter as tk
 
 
@@ -405,7 +405,7 @@ class ChasingEnemy(Enemy):
     def create(self) -> None:
         self.__id = self.canvas.create_rectangle(0, 0, 0, 0,
                                                  fill=self.color)
-        self.speed = random.randint(3,5)
+        self.speed = random.randint(2,4)
         self.x = random.randint(0, self.canvas.winfo_width())
         self.y = random.randint(0, self.canvas.winfo_height())
 
@@ -537,14 +537,6 @@ class CrossEnemy(Enemy):
     def delete(self) -> None:
         self.canvas.delete(self.__id)
 
-# TODO
-# Complete the EnemyGenerator class by inserting code to generate enemies
-# based on the given game level; call TurtleAdventureGame's add_enemy() method
-# to add enemies to the game at certain points in time.
-#
-# Hint: the 'game' parameter is a tkinter's frame, so it's after()
-# method can be used to schedule some future events.
-
 class EnemyGenerator:
     """
     An EnemyGenerator instance is responsible for creating enemies of various
@@ -554,9 +546,9 @@ class EnemyGenerator:
     def __init__(self, game: "TurtleAdventureGame", level: int):
         self.__game: TurtleAdventureGame = game
         self.__level: int = level
-
-        # example
         self.__game.after(100, self.create_enemy)
+        for _ in range(3):
+            self.__game.after(10000, self.create_enemy)
 
     @property
     def game(self) -> "TurtleAdventureGame":
@@ -574,10 +566,43 @@ class EnemyGenerator:
 
     def create_enemy(self) -> None:
         """
-        Create a new enemy, possibly based on the game level
+        Create new enemies, possibly based on the game level
         """
-        for _ in range(10):
-            new_enemy = CrossEnemy(self.__game, 25, "red")
+        self.create_random()
+        self.create_chasing()
+        self.create_fencing()
+        self.create_cross()
+
+    def create_random(self) -> None:
+        """
+        Create RandomWalkEnemy based on the game level
+        """
+        for _ in range(2*self.game.level-1):
+            new_enemy = RandomWalkEnemy(self.__game, 15, 'blue')
+            self.game.add_element(new_enemy)
+
+    def create_chasing(self) -> None:
+        """
+        Create ChasingEnemy based on the game level
+        """
+        for _ in range(math.ceil(self.game.level/3)):
+            new_enemy = ChasingEnemy(self.__game, 20, 'red')
+            self.game.add_element(new_enemy)
+
+    def create_fencing(self) -> None:
+        """
+        Create FencingEnemy based on the game level
+        """
+        for _ in range(math.ceil(self.game.level/2)):
+            new_enemy = FencingEnemy(self.__game, 10, 'green')
+            self.game.add_element(new_enemy)
+
+    def create_cross(self) -> None:
+        """
+        Create CrossEnemy based on the game level
+        """
+        for _ in range(3*self.game.level-2):
+            new_enemy = CrossEnemy(self.__game, 25, 'black')
             self.game.add_element(new_enemy)
 
 

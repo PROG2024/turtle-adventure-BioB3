@@ -2,11 +2,14 @@
 The turtle_adventure module maintains all classes related to the Turtle's
 adventure game.
 """
-from turtle import RawTurtle
-from gamelib import Game, GameElement
-from PIL import Image, ImageTk
-import random, os, math
+import random
+import os
+import math
 import tkinter as tk
+from turtle import RawTurtle
+from PIL import Image, ImageTk
+from gamelib import Game, GameElement
+
 
 
 class TurtleGameElement(GameElement):
@@ -295,35 +298,53 @@ class DemoEnemy(Enemy):
         self.canvas.delete(self.__id)
 
     def state_move_right(self):
+        """
+        State for moving right
+        """
         self.x += self.speed
         if self.check_x_border():
             self.speed *= random.choice([1,1.1])
             self.__x_state = self.state_move_left
 
     def state_move_left(self):
+        """
+        State for moving left
+        """
         self.x -= self.speed
         if self.check_x_border():
             self.speed *= random.choice([1,1.1])
             self.__x_state = self.state_move_right
 
     def state_move_down(self):
+        """
+        State for moving down
+        """
         self.y += self.speed
         if self.check_y_border():
             self.speed *= random.choice([1,1.1])
             self.__y_state = self.state_move_up
 
     def state_move_up(self):
+        """
+        State for moving up
+        """
         self.y -= self.speed
         if self.check_y_border():
             self.speed *= random.choice([1,1.1])
             self.__y_state = self.state_move_down
 
     def check_x_border(self):
+        """
+        Check whether the enemy hit the horizontal border
+        """
         if self.x < 0 or self.x > self.canvas.winfo_width():
             return True
         return False
 
     def check_y_border(self):
+        """
+        Checl whether the enemy hit the vertical border
+        """
         if self.y < 0 or self.y > self.canvas.winfo_height():
             return True
         return False
@@ -347,16 +368,23 @@ class RandomWalkEnemy(Enemy):
                 random.randint(0,self.canvas.winfo_height()))
 
     def update_x(self):
+        """
+        Update the enemy's x coordinate
+        """
         if self.__destination[0] > self.x:
             self.x += min(self.speed, self.__destination[0] - self.x)
         else:
             self.x -= min(self.speed, self.x - self.__destination[0])
 
     def update_y(self):
+        """
+        Update the enemy's y coordinate
+        """
         if self.__destination[1] > self.y:
             self.y += min(self.speed, self.__destination[1] - self.y)
         else:
             self.y -= min(self.speed, self.y - self.__destination[1])
+
     def create(self) -> None:
         self.__id = self.canvas.create_oval(0, 0, 0, 0,
                                        fill=self.color)
@@ -386,7 +414,7 @@ class ChasingEnemy(Enemy):
     """
     Enemy that chase the player by setting the player's location as the waypoint
     """
-    def __init__(self, 
+    def __init__(self,
                  game: "TurtleAdventureGame",
                  size: int,
                  color: str):
@@ -400,12 +428,18 @@ class ChasingEnemy(Enemy):
         return (self.game.player.x, self.game.player.y)
 
     def update_x(self):
+        """
+        Update the enemy's x coordinate
+        """
         if self.__player_loc[0] > self.x:
             self.x += min(self.speed, self.__player_loc[0] - self.x)
         else:
             self.x -= min(self.speed, self.x - self.__player_loc[0])
 
     def update_y(self):
+        """
+        Update the enemy's y coordinate
+        """
         if self.__player_loc[1] > self.y:
             self.y += min(self.speed, self.__player_loc[1] - self.y)
         else:
@@ -454,24 +488,36 @@ class FencingEnemy(Enemy):
         self.y = self.game.home.y + random.randint(18,22)
 
     def move_right_state(self):
+        """
+        State for moving right around the home
+        """
         if self.x < self.game.home.x + 20:
             self.x += self.speed
         else:
             self.__state = self.move_up_state
 
     def move_left_state(self):
+        """
+        State for moving left around the home
+        """
         if self.x > self.game.home.x - 20:
             self.x -= self.speed
         else:
             self.__state = self.move_down_state
 
     def move_up_state(self):
+        """
+        State for moving up around the home
+        """
         if self.y > self.game.home.y - 20:
             self.y -= self.speed
         else:
             self.__state = self.move_left_state
 
     def move_down_state(self):
+        """
+        State for moving down around the home
+        """
         if self.y < self.game.home.y + 20:
             self.y += self.speed
         else:
@@ -514,6 +560,9 @@ class CrossEnemy(Enemy):
         self.speed = random.randint(10,15)
 
     def move_down_state(self):
+        """
+        State for moving down diagonally
+        """
         if self.canvas.winfo_height()-self.y >= 10:
             delta_x = self.canvas.winfo_width() - self.x
             delta_y = self.canvas.winfo_height() - self.y
@@ -528,6 +577,9 @@ class CrossEnemy(Enemy):
             self.__state = self.move_up_state
 
     def move_up_state(self):
+        """
+        State for moving up diagonally
+        """
         if self.y >= 10:
             delta_x = self.canvas.winfo_width() - self.x
             delta_y = self.y

@@ -405,8 +405,8 @@ class ChasingEnemy(Enemy):
     def create(self) -> None:
         self.__id = self.canvas.create_rectangle(0, 0, 0, 0,
                                                  fill=self.color)
-        self.speed = random.randint(2,4)
-        self.x = random.randint(0, self.canvas.winfo_width())
+        self.speed = 2
+        self.x = random.randint(self.canvas.winfo_width()/2, self.canvas.winfo_width())
         self.y = random.randint(0, self.canvas.winfo_height())
 
     def update(self) -> None:
@@ -548,7 +548,7 @@ class EnemyGenerator:
         self.__level: int = level
         self.__game.after(100, self.create_enemy)
         for _ in range(3):
-            self.__game.after(10000, self.create_enemy)
+            self.__game.after(10000, self.create_chasing, level/4)
 
     @property
     def game(self) -> "TurtleAdventureGame":
@@ -581,11 +581,13 @@ class EnemyGenerator:
             new_enemy = RandomWalkEnemy(self.__game, 15, 'blue')
             self.game.add_element(new_enemy)
 
-    def create_chasing(self) -> None:
+    def create_chasing(self, num=None) -> None:
         """
         Create ChasingEnemy based on the game level
         """
-        for _ in range(math.ceil(self.game.level/3)):
+        if not num:
+            num = self.__level
+        for _ in range(math.ceil(num/3)):
             new_enemy = ChasingEnemy(self.__game, 20, 'red')
             self.game.add_element(new_enemy)
 

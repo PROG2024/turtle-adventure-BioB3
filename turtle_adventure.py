@@ -340,6 +340,9 @@ class RandomWalkEnemy(Enemy):
         self.__destination = self.gen_dest()
 
     def gen_dest(self) -> None:
+        """
+        Generate a random destination
+        """
         return (random.randint(0,self.canvas.winfo_width()),
                 random.randint(0,self.canvas.winfo_height()))
 
@@ -380,6 +383,9 @@ class RandomWalkEnemy(Enemy):
         self.canvas.delete(self.__id)
 
 class ChasingEnemy(Enemy):
+    """
+    Enemy that chase the player by setting the player's location as the waypoint
+    """
     def __init__(self, 
                  game: "TurtleAdventureGame",
                  size: int,
@@ -388,6 +394,9 @@ class ChasingEnemy(Enemy):
         self.__player_loc = self.gen_player_loc()
 
     def gen_player_loc(self):
+        """
+        Get the player's location
+        """
         return (self.game.player.x, self.game.player.y)
 
     def update_x(self):
@@ -427,6 +436,9 @@ class ChasingEnemy(Enemy):
         self.canvas.delete(self.__id)
 
 class FencingEnemy(Enemy):
+    """
+    Enemy that guards the home by rotating around it
+    """
     def __init__(self,
                  game: "TurtleAdventureGame",
                  size: int,
@@ -481,6 +493,9 @@ class FencingEnemy(Enemy):
         self.canvas.delete(self.__id)
 
 class CrossEnemy(Enemy):
+    """
+    Enemy that travel in a cross shape from corner to corner
+    """
     def __init__(self,
                  game: "TurtleAdventureGame",
                  size: int,
